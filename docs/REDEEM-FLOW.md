@@ -1,121 +1,174 @@
-# Redeem Flow — OrderID + QR + Redeem & Burn
+# Redeem Flow — OrderID + QR + Redeem & Burn (BNB Chain)
 
 ## 1. States
-Order status lifecycle:
+
+### 1.1 Order status lifecycle
 - CREATED: order created in backend
-- PENDING_CHAIN: customer initiated chain tx (optional intermediate)
-- VALID: chain event confirmed and matched to order
+- PENDING_CHAIN: customer submitted on-chain tx (optional intermediate)
+- VALID: chain event confirmed (N confirmations) and matched to order
 - DELIVERED: reception delivered the service
-- EXPIRED: order expired before redemption
+- EXPIRED: order expired before successful redemption match
 - CANCELLED: order cancelled by customer/admin (optional)
 
-Voucher lifecycle:
+### 1.2 Voucher lifecycle
 - Minted → Held by customer → Redeemed (burned)
 
 ---
 
-## 2. Step-by-step flow
-### Step 1 — Customer creates order (Portal)
-Input:
+## 2. QR payload (MVP)
+
+QR encodes only the `orderId` in a prefixed string:
+
+- Format: `5SOV://order/<orderId>`
+- Example: `5SOV://order/ORD_20260223_ABC123`
+
+Reception Console parses `<orderId>` and calls backend to validate.
+
+---
+
+## 3. orderHash rules (MUST be consistent)
+
+Backend computes `orderHash` using the Solidity equivalent of:
+
+- `orderHash = keccak256(abi.encode(orderId, customerAddress, tokenId, amount, siteId, expiresAt))`
+
+Field definitions:
+- `orderId`: string
+- `customerAddress`: address (0x…)
+- `tokenId`: uint256
+- `amount`: uint256
+- `siteId`: string (use `""` if not enforcing sites yet)
+- `expiresAt`: uint64 unix timestamp (seconds)
+
+Notes:
+- Use `abi.encode(...)` (NOT `abi.encodePacked`) to reduce collision risk.
+- `expiresAt` must be stored and hashed as unix seconds for deterministic hashing.
+
+---
+
+## 4. Step-by-step flow
+
+### Step 1 — Customer creates order (Portal → Backend)
+**Input**
 - tokenId
 - amount
-- siteId (optional but recommended)
-- service-specific info:
-  - For AI Suite: account identifier (email/username)
-  - For Job VIP: provider selection (optional)
+- siteId (recommended; optional only for simplest pilot)
+- service-specific info (optional, in `customerMeta`)
+  - AI Suite: `aiAccount` (email/username)
+  - Job VIP: `jobProvider` (optional)
 
-Backend output:
-- orderId
-- expiresAt (e.g., 30 minutes)
-- orderHash (bytes32)
-- QR payload (contains orderId + minimal info)
+**Backend actions**
+- Validates:
+  - voucher exists in catalog
+  - site applicability (if enabled)
+  - rate limits / spam prevention
+- Generates:
+  - orderId
+  - expiresAt (recommend: 30 minutes from creation)
+  - orderHash
+  - qrPayload
 
-Order status: CREATED
+**Output**
+- orderId, expiresAt, orderHash, qrPayload
+- status = CREATED
+
+---
 
 ### Step 2 — Customer redeems on-chain (MetaMask)
 Portal calls contract:
-- redeemAndBurn(tokenId, amount, orderHash)
+- `redeemAndBurn(tokenId, amount, orderHash)`
 
 Customer signs tx and pays gas in BNB.
 
-Order status: (optionally) PENDING_CHAIN
+Backend may set status to PENDING_CHAIN immediately after the portal submits tx (optional).
 
-### Step 3 — Chain Listener confirms redemption
-Listener watches:
-- VoucherRedeemed(user, tokenId, amount, orderHash)
+---
 
-Listener verifies:
+### Step 3 — Chain Listener confirms and matches redemption
+Listener watches contract events:
+- `VoucherRedeemed(user, tokenId, amount, orderHash)`
+
+**Confirmations**
+- Wait for `N` block confirmations before marking VALID.
+- Recommended MVP value on BNB Chain: `N = 3` (tunable later).
+
+**Matching conditions (ALL required)**
 - orderHash exists in DB
+- order status is CREATED or PENDING_CHAIN
 - user == customerAddress
-- tokenId & amount match
-- now <= expiresAt
-- sufficient confirmations reached
+- tokenId and amount match the order
+- current time <= expiresAt
+- (if enforcing site) order.siteId is valid for the tokenId
 
-If valid:
+If matched:
 - update order status → VALID
-- record chainTxHash
+- store chainTxHash and chainBlockNumber
 
-### Step 4 — Reception validates and delivers
-Reception scans QR (orderId):
-- Backend returns:
-  - status
-  - service details
-  - customer address (masked)
-  - tokenId/unit
-  - expiry and chain proof (optional link)
+If not matched:
+- no status change
+- log mismatch for investigation
+
+---
+
+### Step 4 — Reception validates and delivers (QR scan)
+Reception scans QR and extracts `orderId`, then calls:
+- `GET /api/v1/orders/{orderId}`
 
 If status == VALID:
-- reception delivers service
-- reception marks DELIVERED with:
-  - deliveredAt
-  - deliveredBy
-  - note (optional)
+- deliver the service
+- call `POST /api/v1/orders/{orderId}/deliver`
+
+Deliver request includes:
+- deliveredBy (staffId)
+- deliveredNote (optional)
+
+System sets:
+- status = DELIVERED
+- deliveredAt timestamp
+
+**Idempotency rule**
+- If order is already DELIVERED, repeated deliver calls must not create duplicates.
+- Response should return current DELIVERED state.
 
 ---
 
-## 3. QR payload (recommended)
-QR contains only:
-- orderId
-Optionally:
-- short checksum
-
-Reason:
-- Reception relies on backend for full validation.
-- Avoid embedding sensitive info in QR.
+## 5. Expiry rules
+- Order expires at `expiresAt`.
+- If redemption event arrives after `expiresAt`:
+  - Listener must NOT mark VALID.
+  - Order becomes EXPIRED.
+- Customer must create a new order if still wants to redeem.
 
 ---
 
-## 4. Expiry rules
-- Each order has an expiry window (e.g., 30 minutes).
-- If redemption happens after expiresAt:
-  - Listener does NOT mark VALID
-  - Order becomes EXPIRED
-- Customer must create a new order if needed.
+## 6. Failure scenarios & handling
 
----
+### A) Customer has no gas (BNB)
+- Portal shows: “Need a small amount of BNB for network fee”
+- Provide a simple help guide (where to get BNB, how to send to wallet)
 
-## 5. Failure scenarios & handling
-### A) Customer has no gas
-- Portal shows message: need small BNB for gas
-- Provide help link/FAQ
-
-### B) Wrong tokenId/amount burned
+### B) Customer tries wrong voucher / wrong amount
 - Listener mismatch → order not VALID
-- Customer support required (rare if UI prevents errors)
+- Customer can create a new order with correct selection
 
-### C) Reception scan shows PENDING_CHAIN
-- Ask customer to wait for confirmation
-- Refresh scan until VALID or expiry
+### C) Reception sees PENDING_CHAIN
+- Ask customer to wait for confirmations
+- Refresh until VALID or expiry
 
 ### D) Replay / reuse attempt
-- Burn ensures voucher cannot be reused
-- Order status prevents double delivery (VALID→DELIVERED is one-way)
+- Burn prevents voucher reuse
+- Order state prevents double delivery (VALID→DELIVERED one-way)
+
+### E) Site mismatch (if enforced)
+- Order created for site A but reception at site B:
+  - validation fails (not deliver)
+  - customer must redeem at the correct site or create a new order if policy allows
 
 ---
 
-## 6. Operational checklist for reception
-- Scan QR
-- Confirm status VALID
-- Deliver service
-- Mark DELIVERED
-- If not VALID: do not deliver; instruct customer to redeem again or contact support
+## 7. Operational checklist (Reception)
+1) Scan QR
+2) Confirm status is VALID
+3) Deliver service
+4) Mark DELIVERED with note if needed
+5) If not VALID: do not deliver; instruct customer to redeem again or contact support
