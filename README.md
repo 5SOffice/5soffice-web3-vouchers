@@ -73,3 +73,12 @@ This gives a clean on-chain proof of redemption while keeping real operations si
 ---
 
 ## Repository Structure (Phase 0)
+
+## Project Owner / Author
+
+**Nguyễn Đăng Quang** — Project Owner & Concept Creator  
+- Initiated the concept and product direction for the 5SOffice Web3 Voucher program  
+- Defines scope, voucher catalog, and operational redemption flow  
+- Oversees roadmap and adoption across 5SOffice sites
+
+Brand: **5SOffice** — https://5soffice.com.vn
