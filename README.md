@@ -3,7 +3,7 @@
 **Docs-first repo** for the 5SOffice Web3 Voucher program.
 
 This project introduces **NFT vouchers (ERC-1155)** on **BNB Chain**, redeemable for 5SOffice services (e.g., meeting rooms, printing, day passes) and digital perks (e.g., AI Suite).  
-Primary goal: **brand promotion** and “tech-forward” customer experience — **not** an investment product.
+Primary goal: **brand promotion** and a “tech-forward” customer experience — **not** an investment product.
 
 ---
 
@@ -72,13 +72,49 @@ This gives a clean on-chain proof of redemption while keeping real operations si
 
 ---
 
-## Repository Structure (Phase 0)
+## Documentation (Phase 0)
+
+### 00 — Overview
+- Docs Index: `docs/00-overview/README.md`
+- Brand Message: `docs/00-overview/brand-message.md`
+- Glossary (optional): `docs/00-overview/glossary.md`
+- Roadmap (optional): `docs/00-overview/roadmap.md`
+
+### 01 — Product
+- PRD: `docs/01-product/prd.md`
+- Voucher Catalog: `docs/01-product/catalog.md`
+- Terms (Promo-only): `docs/01-product/terms.md`
+
+### 02 — Architecture
+- Architecture: `docs/02-architecture/architecture.md`
+- Redeem Flow: `docs/02-architecture/redeem-flow.md`
+- Token Spec (ERC-1155): `docs/02-architecture/token-spec.md`
+- Environments: `docs/02-architecture/environments.md`
+
+### 03 — Operations
+- Infrastructure: `docs/03-operations/infra.md`
+- Deployment: `docs/03-operations/deployment.md`
+- Runbooks: `docs/03-operations/runbooks.md`
+- SLA/SLO: `docs/03-operations/sla-slo.md`
+- Security: `docs/03-operations/security.md`
+- Security Baseline: `docs/03-operations/security-baseline.md`
+
+---
+
+## Non-Goals (important)
+
+- Not a financial token or investment product
+- No promise of price appreciation
+- No cash-out / fiat redemption
+- No “trade-to-profit” positioning
+
+---
 
 ## Project Owner / Author
 
 **Nguyễn Đăng Quang** — Project Owner & Concept Creator  
 - Initiated the concept and product direction for the 5SOffice Web3 Voucher program  
 - Defines scope, voucher catalog, and operational redemption flow  
-- Oversees roadmap and adoption across 5SOffice sites
+- Oversees roadmap and adoption across 5SOffice sites  
 
 Brand: **5SOffice** — https://5soffice.com.vn
