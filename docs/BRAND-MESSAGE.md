@@ -1,4 +1,9 @@
 # Brand Message — 5SOffice Web3 Vouchers
+## Program ownership (public-facing)
+This program is initiated and owned by **Nguyễn Đăng Quang** (5SOffice), who defines the concept, voucher utility model, and rollout strategy.
+---
+Program Owner: **Nguyễn Đăng Quang**  
+Brand: **5SOffice** — https://5soffice.com.vn
 
 ## 1. Positioning (must be consistent)
 **5SOffice Web3 Vouchers** is a promotional voucher program that shows 5SOffice applies modern technology to improve customer experience.
