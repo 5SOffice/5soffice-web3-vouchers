@@ -6,6 +6,11 @@ Primary goal: **brand promotion** and demonstrating 5SOffice as a tech-forward S
 
 **Not a financial token.** No cash-out, no investment promise.
 
+## 1.1 Project ownership
+- **Project Owner / Concept Creator:** Nguyễn Đăng Quang
+- **Decision authority:** Product scope, voucher catalog, redemption policy, and rollout roadmap
+- **Primary objective:** Brand promotion and real-world utility for 5SOffice customers
+
 ---
 
 ## 2. Goals
