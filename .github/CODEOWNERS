@@ -1,0 +1,19 @@
+# CODEOWNERS — 5SOffice Web3 Vouchers
+# All changes require review from the project owner.
+
+* @NguyenDangQuang
+
+# Docs
+/docs/ @NguyenDangQuang
+
+# Architecture specs (high risk)
+/docs/02-architecture/ @NguyenDangQuang
+
+# Operations (security-sensitive)
+/docs/03-operations/ @NguyenDangQuang
+
+# Future code folders (Phase 1)
+/contracts/ @NguyenDangQuang
+/backend/ @NguyenDangQuang
+/frontend/ @NguyenDangQuang
+/ops/ @NguyenDangQuang
