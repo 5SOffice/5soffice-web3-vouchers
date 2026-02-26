@@ -112,7 +112,7 @@ This gives a clean on-chain proof of redemption while keeping real operations si
 
 ## Project Owner / Author
 
-**Nguyễn Đăng Quang** — Project Owner & Concept Creator  
+**Nguyễn Đăng Quang** — Lead Auditor ISO/IEC27001, LA ISO/IEC27701, LA ISO/IEC42001, Project Owner & Concept Creator  
 - Initiated the concept and product direction for the 5SOffice Web3 Voucher program  
 - Defines scope, voucher catalog, and operational redemption flow  
 - Oversees roadmap and adoption across 5SOffice sites  
