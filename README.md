@@ -1,120 +1,94 @@
-# 5SOffice Web3 Vouchers (BNB Chain)
+# 5SOffice Voucher & AI Credit Engine
 
-**Docs-first repo** for the 5SOffice Web3 Voucher program.
+**Entitlements, service credits and redemptions for 5SOffice customers and SME tenants — with optional Web3 representation.**
 
-This project introduces **NFT vouchers (ERC-1155)** on **BNB Chain**, redeemable for 5SOffice services (e.g., meeting rooms, printing, day passes) and digital perks (e.g., AI Suite).  
-Primary goal: **brand promotion** and a “tech-forward” customer experience — **not** an investment product.
+This repository is being repositioned from a Web3-first NFT voucher application into a business-first **Voucher & AI Credit Engine**. The core customer journey uses a normal 5SOffice account, QR code and entitlement ledger. ERC-1155 on BNB Chain remains available as an optional adapter for selected campaigns, demonstrations or partners.
 
----
+## Product direction
 
-## Why NFT Vouchers (ERC-1155)?
+```text
+5SOffice Webapp / Tenant Portal / Tenant Agent
+                     |
+                     v
+          Voucher & AI Credit Engine
+ Catalog | Rules | Wallet | Reservation | Redemption | Ledger
+                     |
+          +----------+-----------+
+          |                      |
+          v                      v
+  Business Services       Optional Web3 Adapter
+ Booking / Printing / AI   ERC-1155 / BNB Chain
+```
 
-We choose **ERC-1155** because it is:
-- Simple to operate: **1 voucher = 1 service unit**, redemption = **burn**
-- Easy to scale: many voucher types in **one contract**
-- Clear for customers: less confusion than “coin points”
-- Suitable for promotions: controlled supply per voucher type
+## Why this change
 
----
+A wallet-first and on-chain-only flow adds friction for most SME customers. Business operations must not depend on MetaMask, network fees or blockchain availability. The new design keeps the reusable value of the original voucher concept while making normal account and QR-based use the default.
 
-## MVP (Phase 0 → Phase 1)
+## Core capabilities
 
-### Phase 0 (current): Docs-first
-Focus on product specs, architecture, voucher catalog, and redeem flow.
+- voucher and service-credit catalog;
+- eligibility, validity and campaign rules;
+- customer/tenant entitlement wallet;
+- reservation before service delivery;
+- confirmation, cancellation and release;
+- immutable-enough usage ledger and audit trail;
+- QR redemption for reception and service staff;
+- AI usage credits and expert-escalation credits;
+- API integration with Webapp, Tenant Agent and business services;
+- optional mint, transfer and redemption proof through a Web3 adapter.
 
-### Phase 1: Minimal working MVP on BNB Testnet
-- ERC-1155 contract (voucher types + mint + `redeemAndBurn(orderHash)` + pause)
-- Customer portal (MetaMask connect, view vouchers, create redeem order, redeem)
-- Backend order service + chain listener
-- Reception console (scan QR → validate order → deliver service)
+## AI Service Credits
 
----
+Examples of rights that can be granted by tenancy packages or promotions:
 
-## Core Concept
+- document actions;
+- meeting summaries;
+- marketing workflow actions;
+- compliance checks;
+- expert review or escalation;
+- AI Suite access periods.
 
-- Each voucher type is a `tokenId` (ERC-1155).
-- Customers hold vouchers in MetaMask.
-- Redemption flow:
-  1) Customer creates a **Redeem Order** (OrderID) on portal
-  2) Customer calls **redeem & burn** on-chain with an `orderHash`
-  3) Backend listens to `VoucherRedeemed` event → marks Order **VALID**
-  4) Reception scans QR → **DELIVERED**
+Credits may be included in a service package, purchased, granted by campaign or converted from a voucher. Users should see a simple balance and usage history without needing blockchain knowledge.
 
-This gives a clean on-chain proof of redemption while keeping real operations simple.
+## Default customer journey
 
----
+```text
+Sign in to 5SOffice account
+  -> view eligible vouchers and credits
+  -> choose service or ask the Tenant Agent
+  -> preview conditions and balance impact
+  -> confirm
+  -> reserve entitlement
+  -> complete business transaction
+  -> confirm redemption
+  -> receive QR/reference and ledger record
+```
 
-## Starter Voucher Set (initial 6)
+## Optional Web3 journey
 
-1. **Meeting Room 1h**
-2. **Color Print 10 pages**
-3. **B/W Print 50 pages**
-4. **Coworking Day-pass (1 day)**
-5. **Job VIP Posting (1x)**
-6. **AI Suite (1 month)**
+Selected entitlements may be mirrored or issued as ERC-1155 tokens. The adapter may provide ownership or redemption proof, but the core ledger and business service remain authoritative for operational delivery unless a future approved design states otherwise.
 
-> More vouchers will be added later across 3 groups:
-> - Group A: countable services (burn once = done)
-> - Group B: discounts/promotions (conditions handled by backend Order rules)
-> - Group C: time/quota-based benefits (phase later)
+## Documentation
 
----
+- `docs/00-overview/product-direction-v2.md`
+- `docs/01-product/entitlement-catalog-v2.md`
+- `docs/01-product/ai-service-credits.md`
+- `docs/02-architecture/target-architecture-v2.md`
+- `docs/02-architecture/redemption-state-machine.md`
+- `docs/02-architecture/api-contracts.md`
+- `docs/02-architecture/web3-adapter.md`
+- `docs/03-operations/security-and-controls-v2.md`
+- `docs/04-roadmap/implementation-roadmap-v2.md`
+- `docs/adr/ADR-0001-business-ledger-is-authoritative.md`
 
-## Tech Stack (target)
+## Non-goals
 
-- **Chain:** BNB Chain
-- **Wallet:** MetaMask
-- **Token standard:** ERC-1155
-- **Backend:** Order service + Chain listener (events)
-- **Frontend:**
-  - Customer Portal
-  - Reception Console (QR validation)
+- A financial token, investment product or promise of appreciation.
+- Cash-out or speculative trading features.
+- Requiring customers to use MetaMask.
+- Making business-service availability depend on blockchain uptime.
+- Storing personal or operationally sensitive data on-chain.
 
----
+## Project owner
 
-## Documentation (Phase 0)
-
-### 00 — Overview
-- Docs Index: `docs/00-overview/README.md`
-- Brand Message: `docs/00-overview/brand-message.md`
-- Glossary (optional): `docs/00-overview/glossary.md`
-- Roadmap (optional): `docs/00-overview/roadmap.md`
-
-### 01 — Product
-- PRD: `docs/01-product/prd.md`
-- Voucher Catalog: `docs/01-product/catalog.md`
-- Terms (Promo-only): `docs/01-product/terms.md`
-
-### 02 — Architecture
-- Architecture: `docs/02-architecture/architecture.md`
-- Redeem Flow: `docs/02-architecture/redeem-flow.md`
-- Token Spec (ERC-1155): `docs/02-architecture/token-spec.md`
-- Environments: `docs/02-architecture/environments.md`
-
-### 03 — Operations
-- Infrastructure: `docs/03-operations/infra.md`
-- Deployment: `docs/03-operations/deployment.md`
-- Runbooks: `docs/03-operations/runbooks.md`
-- SLA/SLO: `docs/03-operations/sla-slo.md`
-- Security: `docs/03-operations/security.md`
-- Security Baseline: `docs/03-operations/security-baseline.md`
-
----
-
-## Non-Goals (important)
-
-- Not a financial token or investment product
-- No promise of price appreciation
-- No cash-out / fiat redemption
-- No “trade-to-profit” positioning
-
----
-
-## Project Owner / Author
-
-**Nguyễn Đăng Quang** — Lead Auditor ISO/IEC27001, LA ISO/IEC27701, LA ISO/IEC42001, Project Owner & Concept Creator  
-- Initiated the concept and product direction for the 5SOffice Web3 Voucher program  
-- Defines scope, voucher catalog, and operational redemption flow  
-- Oversees roadmap and adoption across 5SOffice sites  
-
-Brand: **5SOffice** — https://5soffice.com.vn
+**Nguyễn Đăng Quang** — Project Owner and Concept Creator; responsible for product direction, governance and quality review.
